@@ -1,11 +1,11 @@
 # Coercion
 
-[![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/coercion?style=flat-square)](https://packagist.org/packages/decodelabs/coercion)
-[![Latest Version](https://img.shields.io/packagist/v/decodelabs/coercion.svg?style=flat-square)](https://packagist.org/packages/decodelabs/coercion)
-[![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/coercion.svg?style=flat-square)](https://packagist.org/packages/decodelabs/coercion)
-[![Build Status](https://img.shields.io/travis/com/decodelabs/coercion/main.svg?style=flat-square)](https://app.travis-ci.com/github/decodelabs/coercion)
-[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat-square)](https://github.com/phpstan/phpstan)
-[![License](https://img.shields.io/packagist/l/decodelabs/coercion?style=flat-square)](https://packagist.org/packages/decodelabs/coercion)
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/coercion?style=flat)](https://packagist.org/packages/decodelabs/coercion)
+[![Latest Version](https://img.shields.io/packagist/v/decodelabs/coercion.svg?style=flat)](https://packagist.org/packages/decodelabs/coercion)
+[![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/coercion.svg?style=flat)](https://packagist.org/packages/decodelabs/coercion)
+[![Build Status](https://img.shields.io/travis/com/decodelabs/coercion/main.svg?style=flat)](https://app.travis-ci.com/github/decodelabs/coercion)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat)](https://github.com/phpstan/phpstan)
+[![License](https://img.shields.io/packagist/l/decodelabs/coercion?style=flat)](https://packagist.org/packages/decodelabs/coercion)
 
 
 ### Simple tools for managing PHP types
