@@ -161,4 +161,39 @@ class Coercion
 
         return null;
     }
+
+
+    /**
+     * Coerce value to type
+     *
+     * @template T of object
+     * @param mixed $value
+     * @param class-string<T> $type
+     * @return T
+     */
+    public static function toType($value, string $type): object
+    {
+        if (null === ($value = static::toTypeOrNull($value, $type))) {
+            throw Exceptional::InvalidArgument('Value could not be coerced to ' . $type);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce value to type or null
+     *
+     * @template T of object
+     * @param mixed $value
+     * @param class-string<T> $type
+     * @return T|null
+     */
+    public static function toTypeOrNull($value, string $type): ?object
+    {
+        if (!$value instanceof $type) {
+            return null;
+        }
+
+        return $value;
+    }
 }
