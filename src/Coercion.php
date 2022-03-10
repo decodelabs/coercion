@@ -48,6 +48,33 @@ class Coercion
 
 
     /**
+     * Force value to be string
+     *
+     * @param mixed $value
+     */
+    public static function forceString($value): string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_array($value)) {
+            $output = [];
+
+            foreach ($value as $inner) {
+                if (strlen($inner = static::forceString($inner))) {
+                    $output[] = $inner;
+                }
+            }
+
+            return implode(' ', $output);
+        }
+
+        return (string)static::toStringOrNull($value);
+    }
+
+
+    /**
      * Coerce value to bool
      *
      * @param mixed $value
