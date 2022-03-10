@@ -3,7 +3,7 @@
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/decodelabs/coercion?style=flat)](https://packagist.org/packages/decodelabs/coercion)
 [![Latest Version](https://img.shields.io/packagist/v/decodelabs/coercion.svg?style=flat)](https://packagist.org/packages/decodelabs/coercion)
 [![Total Downloads](https://img.shields.io/packagist/dt/decodelabs/coercion.svg?style=flat)](https://packagist.org/packages/decodelabs/coercion)
-[![Build Status](https://img.shields.io/travis/com/decodelabs/coercion/main.svg?style=flat)](https://app.travis-ci.com/github/decodelabs/coercion)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/decodelabs/coercion/PHP%20Composer)](https://github.com/decodelabs/coercion/actions/workflows/php.yml)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-44CC11.svg?longCache=true&style=flat)](https://github.com/phpstan/phpstan)
 [![License](https://img.shields.io/packagist/l/decodelabs/coercion?style=flat)](https://packagist.org/packages/decodelabs/coercion)
 
