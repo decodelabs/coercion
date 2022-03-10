@@ -1,3 +1,6 @@
+## v0.1.2 (2022-03-10)
+* Added forceString()
+
 ## v0.1.1 (2022-03-09)
 * Added toType object coercion handler
 
