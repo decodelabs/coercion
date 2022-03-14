@@ -132,6 +132,33 @@ class Coercion
     }
 
     /**
+     * Ensure value is int between min and max range
+     *
+     * @param mixed $value
+     */
+    public static function clampInt(
+        $value,
+        ?int $min = null,
+        ?int $max = null
+    ): ?int {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = static::toInt($value);
+
+        if ($max !== null) {
+            $value = min($max, $value);
+        }
+
+        if ($min !== null) {
+            $value = max($min, $value);
+        }
+
+        return $value;
+    }
+
+    /**
      * Coerce value to float
      *
      * @param mixed $value
@@ -158,6 +185,72 @@ class Coercion
 
         return null;
     }
+
+
+    /**
+     * Ensure value is float between min and max range
+     *
+     * @param mixed $value
+     */
+    public static function clampFloat(
+        $value,
+        ?float $min = null,
+        ?float $max = null
+    ): ?float {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = static::toFloat($value);
+
+        if ($max !== null) {
+            $value = min($max, $value);
+        }
+
+        if ($min !== null) {
+            $value = max($min, $value);
+        }
+
+        return $value;
+    }
+
+
+    /**
+     * Ensure value is float in 360 degree range
+     *
+     * @param mixed $value
+     */
+    public static function clampDegrees(
+        $value,
+        ?float $min = null,
+        ?float $max = null
+    ): ?float {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = static::toFloat($value);
+
+        while ($value < 0) {
+            $value += 360;
+        }
+
+        while ($value > 359) {
+            $value -= 360;
+        }
+
+        if ($min !== null) {
+            $value = max($min, $value);
+        }
+
+        if ($max !== null) {
+            $value = min($max, $value);
+        }
+
+        return $value;
+    }
+
+
 
     /**
      * Coerce value to array
@@ -198,8 +291,10 @@ class Coercion
      * @param class-string<T> $type
      * @return T
      */
-    public static function toType($value, string $type): object
-    {
+    public static function toType(
+        $value,
+        string $type
+    ): object {
         if (null === ($value = static::toTypeOrNull($value, $type))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to ' . $type);
         }
@@ -215,8 +310,10 @@ class Coercion
      * @param class-string<T> $type
      * @return T|null
      */
-    public static function toTypeOrNull($value, string $type): ?object
-    {
+    public static function toTypeOrNull(
+        $value,
+        string $type
+    ): ?object {
         if (!$value instanceof $type) {
             return null;
         }
