@@ -1,3 +1,6 @@
+## v0.1.3 (2022-03-14)
+* Added number clamps
+
 ## v0.1.2 (2022-03-10)
 * Added forceString()
 
