@@ -289,7 +289,7 @@ class Coercion
      * @template T of object
      * @param mixed $value
      * @phpstan-param class-string<T> $type
-     * @return T
+     * @phpstan-return T
      */
     public static function toType(
         $value,
@@ -307,8 +307,8 @@ class Coercion
      *
      * @template T of object
      * @param mixed $value
-     * @param class-string<T> $type
-     * @return T|null
+     * @phpstan-param class-string<T> $type
+     * @phpstan-return T|null
      */
     public static function toTypeOrNull(
         $value,
