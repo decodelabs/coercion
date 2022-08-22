@@ -288,7 +288,7 @@ class Coercion
      *
      * @template T of object
      * @param mixed $value
-     * @param class-string<T> $type
+     * @phpstan-param class-string<T> $type
      * @return T
      */
     public static function toType(
