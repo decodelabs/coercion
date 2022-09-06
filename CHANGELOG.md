@@ -1,3 +1,7 @@
+## v0.2.2 (2022-09-06)
+* Added full Stringable support
+* Updated CI environment
+
 ## v0.2.1 (2022-08-23)
 * Added concrete types to all members
 

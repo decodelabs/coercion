@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace DecodeLabs;
 
+use Stringable;
+
 class Coercion
 {
     /**
@@ -30,11 +32,8 @@ class Coercion
     {
         if (
             is_string($value) ||
-            is_numeric($value) ||
-            (
-                is_object($value) &&
-                method_exists($value, '__toString')
-            )
+            $value instanceof Stringable ||
+            is_numeric($value)
         ) {
             return (string)$value;
         }
@@ -65,6 +64,17 @@ class Coercion
         }
 
         return (string)static::toStringOrNull($value);
+    }
+
+    /**
+     * Is value stringable
+     */
+    public static function isStringable(mixed $value): bool
+    {
+        return
+            is_string($value) ||
+            $value instanceof Stringable ||
+            is_numeric($value);
     }
 
 
