@@ -1,3 +1,6 @@
+## v0.2.5 (2022-10-17)
+* Added toDateTime()
+
 ## v0.2.4 (2022-10-17)
 * Added iterableToArray
 
