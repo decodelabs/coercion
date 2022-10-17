@@ -1,3 +1,6 @@
+## v0.2.4 (2022-10-17)
+* Added iterableToArray
+
 ## v0.2.3 (2022-10-17)
 * Added iterator_to_array in toArray()
 * Updated composer check script
