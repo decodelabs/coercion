@@ -271,6 +271,25 @@ class Coercion
         return null;
     }
 
+    /**
+     * Iterable to array
+     *
+     * @template TKey of int|string
+     * @template TValue
+     * @phpstan-param array<TKey, TValue>|iterable<TKey, TValue> $value
+     *
+     * @phpstan-return array<TKey, TValue>
+     */
+    public static function iterableToArray(iterable $value): array
+    {
+        if (!is_array($value)) {
+            $value = iterator_to_array($value);
+        }
+
+        return $value;
+    }
+
+
 
     /**
      * Coerce value to type
