@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace DecodeLabs;
 
 use Stringable;
+use Traversable;
 
 class Coercion
 {
@@ -261,6 +262,10 @@ class Coercion
     {
         if (is_array($value)) {
             return (array)$value;
+        }
+
+        if ($value instanceof Traversable) {
+            $value = iterator_to_array($value);
         }
 
         return null;

@@ -12,6 +12,11 @@
 
 Coercion offers simple tools to help neatly handle coercion of mixed parameters, especially useful when dealing with higher level static analysis test which require strict type handling.
 
+_Get news and updates on the [DecodeLabs blog](https://blog.decodelabs.com)._
+
+---
+
+
 ## Installation
 
 Install via Composer:

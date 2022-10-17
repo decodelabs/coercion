@@ -1,3 +1,7 @@
+## v0.2.3 (2022-10-17)
+* Added iterator_to_array in toArray()
+* Updated composer check script
+
 ## v0.2.2 (2022-09-06)
 * Added full Stringable support
 * Updated CI environment
