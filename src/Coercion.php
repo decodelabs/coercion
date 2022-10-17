@@ -12,6 +12,7 @@ namespace DecodeLabs;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
+use Exception;
 use Stringable;
 use Traversable;
 
@@ -376,5 +377,56 @@ class Coercion
         }
 
         return $date;
+    }
+
+
+
+    /**
+     * Coerce value to DateTime
+     */
+    public static function toDateInterval(
+        DateTimeInterface|DateInterval|string|Stringable|int|null $value
+    ): DateInterval {
+        if (null === ($value = static::toDateIntervalOrNull($value))) {
+            throw Exceptional::InvalidArgument('Value could not be coerced to DateInterval');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce value to DateTime
+     */
+    public static function toDateIntervalOrNull(
+        DateTimeInterface|DateInterval|string|Stringable|int|null $interval
+    ): ?DateInterval {
+        if ($interval === null) {
+            return null;
+        } elseif ($interval instanceof DateInterval) {
+            return $interval;
+        }
+
+        if ($interval instanceof DateTimeInterface) {
+            return $interval->diff(new DateTime('now'));
+        }
+
+        if (is_int($interval)) {
+            if ($interval < time() / 10) {
+                return DateInterval::createFromDateString((string)$interval . ' seconds');
+            }
+
+            $interval = static::toDateTime($interval);
+            return $interval->diff(new DateTime('now'));
+        }
+
+        $interval = (string)$interval;
+
+        if (false === strpos($interval, ' ')) {
+            try {
+                return new DateInterval($interval);
+            } catch (Exception $e) {
+            }
+        }
+        return DateInterval::createFromDateString($interval);
     }
 }
