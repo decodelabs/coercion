@@ -1,3 +1,7 @@
+## v0.2.6 (2022-10-17)
+* Added toDateInterval()
+* Fixed DateTimeInterface handling
+
 ## v0.2.5 (2022-10-17)
 * Added toDateTime()
 
