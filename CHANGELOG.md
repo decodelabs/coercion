@@ -1,3 +1,5 @@
+* Fixed PHP8.1 testing
+
 ## v0.2.6 (2022-10-17)
 * Added toDateInterval()
 * Fixed DateTimeInterface handling
