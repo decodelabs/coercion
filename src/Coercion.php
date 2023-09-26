@@ -280,9 +280,8 @@ class Coercion
      *
      * @template TKey of int|string
      * @template TValue
-     * @phpstan-param array<TKey, TValue>|iterable<TKey, TValue> $value
-     *
-     * @phpstan-return array<TKey, TValue>
+     * @param array<TKey, TValue>|iterable<TKey, TValue> $value
+     * @return array<TKey, TValue>
      */
     public static function iterableToArray(iterable $value): array
     {
@@ -299,8 +298,8 @@ class Coercion
      * Coerce value to type
      *
      * @template T of object
-     * @phpstan-param class-string<T> $type
-     * @phpstan-return T
+     * @param class-string<T> $type
+     * @return T
      */
     public static function toType(
         mixed $value,
@@ -317,8 +316,8 @@ class Coercion
      * Coerce value to type or null
      *
      * @template T of object
-     * @phpstan-param class-string<T> $type
-     * @phpstan-return T|null
+     * @param class-string<T> $type
+     * @return T|null
      */
     public static function toTypeOrNull(
         mixed $value,

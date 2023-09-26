@@ -1,3 +1,4 @@
+* Converted phpstan doc comments to generic
 * Fixed PHP8.1 testing
 * Migrated to use effigy in CI workflow
 
