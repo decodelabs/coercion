@@ -1,3 +1,5 @@
+* Check for DateInterval parse failure
+
 ## v0.2.7 (2023-09-26)
 * Converted phpstan doc comments to generic
 * Fixed PHP8.1 testing

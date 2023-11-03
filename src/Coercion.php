@@ -21,8 +21,9 @@ class Coercion
     /**
      * Coerce value to string
      */
-    public static function toString(mixed $value): string
-    {
+    public static function toString(
+        mixed $value
+    ): string {
         if (null === ($value = static::toStringOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to string');
         }
@@ -33,8 +34,9 @@ class Coercion
     /**
      * Coerce value to string or null
      */
-    public static function toStringOrNull(mixed $value): ?string
-    {
+    public static function toStringOrNull(
+        mixed $value
+    ): ?string {
         if (
             is_string($value) ||
             $value instanceof Stringable ||
@@ -50,8 +52,9 @@ class Coercion
     /**
      * Force value to be string
      */
-    public static function forceString(mixed $value): string
-    {
+    public static function forceString(
+        mixed $value
+    ): string {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
@@ -74,8 +77,9 @@ class Coercion
     /**
      * Is value stringable
      */
-    public static function isStringable(mixed $value): bool
-    {
+    public static function isStringable(
+        mixed $value
+    ): bool {
         return
             is_string($value) ||
             $value instanceof Stringable ||
@@ -86,8 +90,9 @@ class Coercion
     /**
      * Coerce value to bool
      */
-    public static function toBool(mixed $value): bool
-    {
+    public static function toBool(
+        mixed $value
+    ): bool {
         if (null === ($value = static::toBoolOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to bool');
         }
@@ -98,8 +103,9 @@ class Coercion
     /**
      * Coerce value to bool or null
      */
-    public static function toBoolOrNull(mixed $value): ?bool
-    {
+    public static function toBoolOrNull(
+        mixed $value
+    ): ?bool {
         if ($value === null) {
             return null;
         }
@@ -111,8 +117,9 @@ class Coercion
     /**
      * Coerce value to int
      */
-    public static function toInt(mixed $value): int
-    {
+    public static function toInt(
+        mixed $value
+    ): int {
         if (null === ($value = static::toIntOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to int');
         }
@@ -123,8 +130,9 @@ class Coercion
     /**
      * Coerce value to int or null
      */
-    public static function toIntOrNull(mixed $value): ?int
-    {
+    public static function toIntOrNull(
+        mixed $value
+    ): ?int {
         if (is_numeric($value)) {
             return (int)$value;
         }
@@ -160,8 +168,9 @@ class Coercion
     /**
      * Coerce value to float
      */
-    public static function toFloat(mixed $value): float
-    {
+    public static function toFloat(
+        mixed $value
+    ): float {
         if (null === ($value = static::toFloatOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to float');
         }
@@ -172,8 +181,9 @@ class Coercion
     /**
      * Coerce value to float or null
      */
-    public static function toFloatOrNull(mixed $value): ?float
-    {
+    public static function toFloatOrNull(
+        mixed $value
+    ): ?float {
         if (is_numeric($value)) {
             return (float)$value;
         }
@@ -248,8 +258,9 @@ class Coercion
      *
      * @return array<mixed>
      */
-    public static function toArray(mixed $value): array
-    {
+    public static function toArray(
+        mixed $value
+    ): array {
         if (null === ($value = static::toArrayOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to array');
         }
@@ -262,8 +273,9 @@ class Coercion
      *
      * @return array<mixed>|null
      */
-    public static function toArrayOrNull(mixed $value): ?array
-    {
+    public static function toArrayOrNull(
+        mixed $value
+    ): ?array {
         if (is_array($value)) {
             return (array)$value;
         }
@@ -283,8 +295,9 @@ class Coercion
      * @param array<TKey, TValue>|iterable<TKey, TValue> $value
      * @return array<TKey, TValue>
      */
-    public static function iterableToArray(iterable $value): array
-    {
+    public static function iterableToArray(
+        iterable $value
+    ): array {
         if (!is_array($value)) {
             $value = iterator_to_array($value);
         }
@@ -411,7 +424,13 @@ class Coercion
 
         if (is_int($interval)) {
             if ($interval < time() / 10) {
-                return DateInterval::createFromDateString((string)$interval . ' seconds');
+                if (false === ($output = DateInterval::createFromDateString((string)$interval . ' seconds'))) {
+                    throw Exceptional::InvalidArgument(
+                        'DateInterval value could not be parsed'
+                    );
+                }
+
+                return $output;
             }
 
             $interval = static::toDateTime($interval);
@@ -426,6 +445,13 @@ class Coercion
             } catch (Exception $e) {
             }
         }
-        return DateInterval::createFromDateString($interval);
+
+        if (false === ($output = DateInterval::createFromDateString($interval))) {
+            throw Exceptional::InvalidArgument(
+                'DateInterval value could not be parsed'
+            );
+        }
+
+        return $output;
     }
 }
