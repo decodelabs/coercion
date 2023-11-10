@@ -1,3 +1,4 @@
+* Made PHP8.1 minimum version
 * Check for DateInterval parse failure
 
 ## v0.2.7 (2023-09-26)

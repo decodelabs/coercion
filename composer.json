@@ -2,14 +2,14 @@
     "name": "decodelabs/coercion",
     "description": "Simple tools for managing PHP types",
     "type": "library",
-    "keywords": ["type", "data", "structure"],
+    "keywords": [ "type", "data", "structure" ],
     "license": "MIT",
-    "authors": [{
-        "name": "Tom Wright",
-        "email": "tom@inflatablecookie.com"
-    }],
+    "authors": [ {
+            "name": "Tom Wright",
+            "email": "tom@inflatablecookie.com"
+        } ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
 
         "decodelabs/exceptional": "^0.4"
     },
