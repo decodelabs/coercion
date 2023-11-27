@@ -35,14 +35,24 @@ class Coercion
      * Coerce value to string or null
      */
     public static function toStringOrNull(
-        mixed $value
+        mixed $value,
+        bool $nonEmpty = false
     ): ?string {
         if (
             is_string($value) ||
             $value instanceof Stringable ||
             is_numeric($value)
         ) {
-            return (string)$value;
+            $output = (string)$value;
+
+            if (
+                $nonEmpty &&
+                $output === ''
+            ) {
+                return null;
+            }
+
+            return $output;
         }
 
         return null;

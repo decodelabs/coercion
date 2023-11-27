@@ -1,3 +1,4 @@
+* Added non-empty flag to toStringOrNull()
 * Made PHP8.1 minimum version
 * Check for DateInterval parse failure
 
