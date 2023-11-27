@@ -1,3 +1,8 @@
+## v0.2.8 (2023-11-27)
+* Added non-empty flag to toStringOrNull()
+* Made PHP8.1 minimum version
+* Check for DateInterval parse failure
+
 ## v0.2.7 (2023-09-26)
 * Converted phpstan doc comments to generic
 * Fixed PHP8.1 testing
