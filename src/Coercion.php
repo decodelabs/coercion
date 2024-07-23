@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace DecodeLabs;
 
+use BackedEnum;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use Exception;
 use Stringable;
 use Traversable;
+use UnitEnum;
 
 class Coercion
 {
@@ -38,6 +40,14 @@ class Coercion
         mixed $value,
         bool $nonEmpty = false
     ): ?string {
+        if ($value instanceof BackedEnum) {
+            $value = is_int($value->value) ?
+                $value->name :
+                $value->value;
+        } elseif ($value instanceof UnitEnum) {
+            $value = $value->name;
+        }
+
         if (
             is_string($value) ||
             $value instanceof Stringable ||
@@ -143,11 +153,33 @@ class Coercion
     public static function toIntOrNull(
         mixed $value
     ): ?int {
+        if ($value instanceof BackedEnum) {
+            $value = is_int($value->value) ?
+                $value->value :
+                static::getEnumIndex($value);
+        } elseif ($value instanceof UnitEnum) {
+            $value = static::getEnumIndex($value);
+        }
+
         if (is_numeric($value)) {
             return (int)$value;
         }
 
         return null;
+    }
+
+    protected static function getEnumIndex(
+        UnitEnum $enum
+    ): int {
+        foreach ($enum::cases() as $i => $case) {
+            if ($case === $enum) {
+                return $i;
+            }
+        }
+
+        throw Exceptional::InvalidArgument(
+            'Enum case not found'
+        );
     }
 
     /**
