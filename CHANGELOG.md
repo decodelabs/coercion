@@ -1,3 +1,4 @@
+## v0.2.9 (2024-07-23)
 * Added enum support to string and int coercion
 
 ## v0.2.8 (2023-11-27)
