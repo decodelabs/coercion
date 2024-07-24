@@ -1,3 +1,4 @@
+## v0.2.10 (2024-07-24)
 * Added casting to stdClass
 * Added forceArray()
 
