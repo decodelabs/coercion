@@ -14,6 +14,7 @@ use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use stdClass;
 use Stringable;
 use Traversable;
 use UnitEnum;
@@ -318,15 +319,44 @@ class Coercion
     public static function toArrayOrNull(
         mixed $value
     ): ?array {
-        if (is_array($value)) {
+        if (
+            is_array($value) ||
+            $value instanceof stdClass
+        ) {
             return (array)$value;
         }
 
         if ($value instanceof Traversable) {
-            $value = iterator_to_array($value);
+            return iterator_to_array($value);
         }
 
         return null;
+    }
+
+    /**
+     * Force array value
+     *
+     * @return array<mixed>
+     */
+    public function forceArray(
+        mixed $value
+    ): array {
+        if (
+            is_array($value) ||
+            $value instanceof stdClass
+        ) {
+            return (array)$value;
+        }
+
+        if ($value instanceof Traversable) {
+            return iterator_to_array($value);
+        }
+
+        if ($value === null) {
+            return [];
+        }
+
+        return [$value];
     }
 
     /**
@@ -345,6 +375,37 @@ class Coercion
         }
 
         return $value;
+    }
+
+
+    /**
+     * Coerce to stdClass
+     */
+    public static function toStdClass(
+        mixed $value
+    ): stdClass {
+        if (null === ($value = static::toStdClassOrNull($value))) {
+            throw Exceptional::InvalidArgument('Value could not be coerced to stdClass');
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce to stdClass or null
+     */
+    public static function toStdClassOrNull(
+        mixed $value
+    ): ?stdClass {
+        if ($value instanceof stdClass) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            return (object)$value;
+        }
+
+        return null;
     }
 
 

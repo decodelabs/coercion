@@ -1,3 +1,6 @@
+* Added casting to stdClass
+* Added forceArray()
+
 ## v0.2.9 (2024-07-23)
 * Added enum support to string and int coercion
 
