@@ -1,3 +1,4 @@
+## v0.2.12 (2024-09-03)
 * Fixed empty string to bool coercion
 
 ## v0.2.11 (2024-09-03)
