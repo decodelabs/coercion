@@ -1,3 +1,9 @@
+## v0.2.11 (2024-09-03)
+* Accept mixed in date casts
+* Added force methods for numbers
+* Parse string boolean values
+* Added parseBool()
+
 ## v0.2.10 (2024-07-24)
 * Added casting to stdClass
 * Added forceArray()

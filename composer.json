@@ -14,7 +14,8 @@
         "decodelabs/exceptional": "^0.4"
     },
     "require-dev": {
-        "decodelabs/phpstan-decodelabs": "^0.6"
+        "decodelabs/phpstan-decodelabs": "^0.6",
+        "nesbot/carbon": "^3.8"
     },
     "autoload": {
         "psr-4": {
