@@ -114,11 +114,7 @@ class Coercion
     public static function toBool(
         mixed $value
     ): bool {
-        if (null === ($value = static::toBoolOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to bool');
-        }
-
-        return $value;
+        return (bool)static::toBoolOrNull($value);
     }
 
     /**
@@ -127,11 +123,53 @@ class Coercion
     public static function toBoolOrNull(
         mixed $value
     ): ?bool {
-        if ($value === null) {
-            return null;
+        if (
+            $value === null ||
+            is_bool($value)
+        ) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $value = strtolower($value);
+
+            return match ($value) {
+                '0', 'false', 'no', 'off' => false,
+                default => true
+            };
         }
 
         return (bool)$value;
+    }
+
+    /**
+     * Coerce value to bool if boolsy or null
+     */
+    public static function parseBool(
+        mixed $value
+    ): ?bool {
+        if (
+            $value === null ||
+            is_bool($value)
+        ) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $value = strtolower($value);
+
+            return match ($value) {
+                '1', 'true', 'yes', 'on' => true,
+                '0', 'false', 'no', 'off' => false,
+                default => null
+            };
+        }
+
+        if (is_numeric($value)) {
+            return $value <> 0;
+        }
+
+        return null;
     }
 
 
@@ -183,6 +221,17 @@ class Coercion
         );
     }
 
+
+    /**
+     * Force value to be int
+     */
+    public static function forceInt(
+        mixed $value
+    ): int {
+        return static::toIntOrNull($value) ?? 0;
+    }
+
+
     /**
      * Ensure value is int between min and max range
      */
@@ -232,6 +281,15 @@ class Coercion
         }
 
         return null;
+    }
+
+    /**
+     * Force value to be float
+     */
+    public static function forceFloat(
+        mixed $value
+    ): float {
+        return static::toFloatOrNull($value) ?? 0.0;
     }
 
 
@@ -408,6 +466,15 @@ class Coercion
         return null;
     }
 
+    /**
+     * Force value to be stdClass
+     */
+    public static function forceStdClass(
+        mixed $value
+    ): stdClass {
+        return static::toStdClassOrNull($value) ?? new stdClass();
+    }
+
 
 
     /**
@@ -450,9 +517,13 @@ class Coercion
 
     /**
      * Coerce value to DateTime
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateTimeInterface ? T : DateTime)
      */
     public static function toDateTime(
-        DateTimeInterface|DateInterval|string|Stringable|int|null $value
+        mixed $value
     ): DateTimeInterface {
         if (null === ($value = static::toDateTimeOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to DateTime');
@@ -463,44 +534,54 @@ class Coercion
 
     /**
      * Coerce value to DateTime
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateTimeInterface ? T : ?DateTime)
      */
     public static function toDateTimeOrNull(
-        DateTimeInterface|DateInterval|string|Stringable|int|null $date
+        mixed $value
     ): ?DateTimeInterface {
-        if ($date === null) {
+        if ($value === null) {
             return null;
-        } elseif ($date instanceof DateTimeInterface) {
-            return $date;
+        } elseif ($value instanceof DateTimeInterface) {
+            return $value;
         }
 
-        if ($date instanceof DateInterval) {
+        if ($value instanceof DateInterval) {
             $now = new DateTime('now');
-            return $now->add($date);
+            return $now->add($value);
         }
 
         $timestamp = null;
 
-        if (is_numeric($date)) {
-            $timestamp = $date;
-            $date = 'now';
+        if (is_numeric($value)) {
+            $timestamp = $value;
+            $value = 'now';
+        } elseif (null === ($value = static::toStringOrNull($value))) {
+            return null;
         }
 
-        $date = new DateTime((string)$date);
+        $value = new DateTime($value);
 
         if ($timestamp !== null) {
-            $date->setTimestamp((int)$timestamp);
+            $value->setTimestamp((int)$timestamp);
         }
 
-        return $date;
+        return $value;
     }
 
 
 
     /**
-     * Coerce value to DateTime
+     * Coerce value to DateInterval
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateInterval ? T : DateInterval)
      */
     public static function toDateInterval(
-        DateTimeInterface|DateInterval|string|Stringable|int|null $value
+        mixed $value
     ): DateInterval {
         if (null === ($value = static::toDateIntervalOrNull($value))) {
             throw Exceptional::InvalidArgument('Value could not be coerced to DateInterval');
@@ -510,24 +591,32 @@ class Coercion
     }
 
     /**
-     * Coerce value to DateTime
+     * Coerce value to DateInterval or null
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateInterval ? T : ?DateInterval)
      */
     public static function toDateIntervalOrNull(
-        DateTimeInterface|DateInterval|string|Stringable|int|null $interval
+        mixed $value
     ): ?DateInterval {
-        if ($interval === null) {
+        if ($value === null) {
             return null;
-        } elseif ($interval instanceof DateInterval) {
-            return $interval;
+        } elseif ($value instanceof DateInterval) {
+            return $value;
         }
 
-        if ($interval instanceof DateTimeInterface) {
-            return $interval->diff(new DateTime('now'));
+        if ($value instanceof DateTimeInterface) {
+            return $value->diff(new DateTime('now'));
         }
 
-        if (is_int($interval)) {
-            if ($interval < time() / 10) {
-                if (false === ($output = DateInterval::createFromDateString((string)$interval . ' seconds'))) {
+        if (is_float($value)) {
+            $value = (int)$value;
+        }
+
+        if (is_int($value)) {
+            if ($value < time() / 10) {
+                if (false === ($output = DateInterval::createFromDateString((string)$value . ' seconds'))) {
                     throw Exceptional::InvalidArgument(
                         'DateInterval value could not be parsed'
                     );
@@ -536,20 +625,22 @@ class Coercion
                 return $output;
             }
 
-            $interval = static::toDateTime($interval);
-            return $interval->diff(new DateTime('now'));
+            $value = static::toDateTime($value);
+            return $value->diff(new DateTime('now'));
         }
 
-        $interval = (string)$interval;
+        if (null === ($value = static::toStringOrNull($value))) {
+            return null;
+        }
 
-        if (false === strpos($interval, ' ')) {
+        if (false === strpos($value, ' ')) {
             try {
-                return new DateInterval($interval);
+                return new DateInterval($value);
             } catch (Exception $e) {
             }
         }
 
-        if (false === ($output = DateInterval::createFromDateString($interval))) {
+        if (false === ($output = DateInterval::createFromDateString($value))) {
             throw Exceptional::InvalidArgument(
                 'DateInterval value could not be parsed'
             );
