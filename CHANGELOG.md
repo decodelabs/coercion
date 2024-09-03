@@ -1,3 +1,4 @@
+## v0.2.11 (2024-09-03)
 * Accept mixed in date casts
 * Added force methods for numbers
 * Parse string boolean values
