@@ -134,6 +134,7 @@ class Coercion
             $value = strtolower($value);
 
             return match ($value) {
+                '' => null,
                 '0', 'false', 'no', 'off' => false,
                 default => true
             };
