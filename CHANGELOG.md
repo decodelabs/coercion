@@ -1,3 +1,5 @@
+* Fixed forceArray static method
+
 ## v0.2.12 (2024-09-03)
 * Fixed empty string to bool coercion
 
