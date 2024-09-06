@@ -1,3 +1,4 @@
+## v0.2.13 (2024-09-06)
 * Fixed forceArray static method
 
 ## v0.2.12 (2024-09-03)
