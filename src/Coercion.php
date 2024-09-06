@@ -397,7 +397,7 @@ class Coercion
      *
      * @return array<mixed>
      */
-    public function forceArray(
+    public static function forceArray(
         mixed $value
     ): array {
         if (
