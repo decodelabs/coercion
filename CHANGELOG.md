@@ -1,3 +1,4 @@
+## v0.2.14 (2024-11-07)
 * Stringify Stringables in numeric conversions
 
 ## v0.2.13 (2024-09-06)
