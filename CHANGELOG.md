@@ -1,3 +1,5 @@
+* Stringify Stringables in numeric conversions
+
 ## v0.2.13 (2024-09-06)
 * Fixed forceArray static method
 
