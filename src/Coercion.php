@@ -201,6 +201,10 @@ class Coercion
             $value = static::getEnumIndex($value);
         }
 
+        if ($value instanceof Stringable) {
+            $value = (string)$value;
+        }
+
         if (is_numeric($value)) {
             return (int)$value;
         }
@@ -277,6 +281,10 @@ class Coercion
     public static function toFloatOrNull(
         mixed $value
     ): ?float {
+        if ($value instanceof Stringable) {
+            $value = (string)$value;
+        }
+
         if (is_numeric($value)) {
             return (float)$value;
         }
