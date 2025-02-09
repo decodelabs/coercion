@@ -1,3 +1,5 @@
+* Added PHP8.4 to CI workflow
+
 ## v0.2.14 (2024-11-07)
 * Stringify Stringables in numeric conversions
 
