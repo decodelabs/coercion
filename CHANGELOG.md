@@ -1,4 +1,7 @@
+## v0.2.15 (2025-02-11)
+* Added lazy object support
 * Added PHP8.4 to CI workflow
+* Made PHP8.4 minimum version
 
 ## v0.2.14 (2024-11-07)
 * Stringify Stringables in numeric conversions

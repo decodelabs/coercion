@@ -14,6 +14,7 @@ use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use ReflectionClass;
 use stdClass;
 use Stringable;
 use Traversable;
@@ -489,7 +490,9 @@ class Coercion
     /**
      * Coerce value to type
      *
+     * @template V of object
      * @template T of object
+     * @param V $value
      * @param class-string<T> $type
      * @return T
      */
@@ -507,7 +510,9 @@ class Coercion
     /**
      * Coerce value to type or null
      *
+     * @template V of object
      * @template T of object
+     * @param V $value
      * @param class-string<T> $type
      * @return T|null
      */
@@ -520,6 +525,39 @@ class Coercion
         }
 
         return $value;
+    }
+
+
+    /**
+     * Create lazy ghost object
+     *
+     * @template T of object
+     * @param class-string<T> $type
+     * @param callable(T): void $initializer
+     * @return T
+     */
+    public static function newLazyGhost(
+        string $type,
+        callable $initializer
+    ): object {
+        $ref = new ReflectionClass($type);
+        return $ref->newLazyGhost($initializer);
+    }
+
+    /**
+     * Create lazy proxy object
+     *
+     * @template T of object
+     * @param class-string<T> $type
+     * @param callable(T): T $factory
+     * @return T
+     */
+    public static function newLazyProxy(
+        string $type,
+        callable $factory
+    ): object {
+        $ref = new ReflectionClass($type);
+        return $ref->newLazyProxy($factory);
     }
 
 
