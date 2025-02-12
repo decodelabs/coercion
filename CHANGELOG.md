@@ -1,3 +1,5 @@
+* Improved Exception syntax
+
 ## v0.2.15 (2025-02-11)
 * Added lazy object support
 * Added PHP8.4 to CI workflow

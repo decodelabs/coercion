@@ -29,7 +29,9 @@ class Coercion
         mixed $value
     ): string {
         if (null === ($value = static::toStringOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to string');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to string'
+            );
         }
 
         return $value;
@@ -182,7 +184,9 @@ class Coercion
         mixed $value
     ): int {
         if (null === ($value = static::toIntOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to int');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to int'
+            );
         }
 
         return $value;
@@ -223,7 +227,7 @@ class Coercion
         }
 
         throw Exceptional::InvalidArgument(
-            'Enum case not found'
+            message: 'Enum case not found'
         );
     }
 
@@ -270,7 +274,9 @@ class Coercion
         mixed $value
     ): float {
         if (null === ($value = static::toFloatOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to float');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to float'
+            );
         }
 
         return $value;
@@ -373,7 +379,9 @@ class Coercion
         mixed $value
     ): array {
         if (null === ($value = static::toArrayOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to array');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to array'
+            );
         }
 
         return $value;
@@ -453,7 +461,9 @@ class Coercion
         mixed $value
     ): stdClass {
         if (null === ($value = static::toStdClassOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to stdClass');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to stdClass'
+            );
         }
 
         return $value;
@@ -501,7 +511,9 @@ class Coercion
         string $type
     ): object {
         if (null === ($value = static::toTypeOrNull($value, $type))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to ' . $type);
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to ' . $type
+            );
         }
 
         return $value;
@@ -573,7 +585,9 @@ class Coercion
         mixed $value
     ): DateTimeInterface {
         if (null === ($value = static::toDateTimeOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to DateTime');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to DateTime'
+            );
         }
 
         return $value;
@@ -631,7 +645,9 @@ class Coercion
         mixed $value
     ): DateInterval {
         if (null === ($value = static::toDateIntervalOrNull($value))) {
-            throw Exceptional::InvalidArgument('Value could not be coerced to DateInterval');
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to DateInterval'
+            );
         }
 
         return $value;
@@ -665,7 +681,7 @@ class Coercion
             if ($value < time() / 10) {
                 if (false === ($output = DateInterval::createFromDateString((string)$value . ' seconds'))) {
                     throw Exceptional::InvalidArgument(
-                        'DateInterval value could not be parsed'
+                        message: 'DateInterval value could not be parsed'
                     );
                 }
 
@@ -689,7 +705,7 @@ class Coercion
 
         if (false === ($output = DateInterval::createFromDateString($value))) {
             throw Exceptional::InvalidArgument(
-                'DateInterval value could not be parsed'
+                message: 'DateInterval value could not be parsed'
             );
         }
 
