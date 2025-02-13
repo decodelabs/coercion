@@ -1,4 +1,5 @@
 * Improved Exception syntax
+* Updated dependencies
 
 ## v0.2.15 (2025-02-11)
 * Added lazy object support
