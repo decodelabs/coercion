@@ -1,3 +1,5 @@
+## v0.2.16 (2025-02-17)
+* Accept mixed in toType() functions
 * Improved Exception syntax
 * Updated dependencies
 

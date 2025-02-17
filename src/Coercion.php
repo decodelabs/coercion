@@ -440,8 +440,8 @@ class Coercion
      *
      * @template TKey of int|string
      * @template TValue
-     * @param array<TKey, TValue>|iterable<TKey, TValue> $value
-     * @return array<TKey, TValue>
+     * @param array<TKey,TValue>|iterable<TKey,TValue> $value
+     * @return array<TKey,TValue>
      */
     public static function iterableToArray(
         iterable $value
@@ -500,9 +500,7 @@ class Coercion
     /**
      * Coerce value to type
      *
-     * @template V of object
      * @template T of object
-     * @param V $value
      * @param class-string<T> $type
      * @return T
      */
@@ -522,9 +520,7 @@ class Coercion
     /**
      * Coerce value to type or null
      *
-     * @template V of object
      * @template T of object
-     * @param V $value
      * @param class-string<T> $type
      * @return T|null
      */
