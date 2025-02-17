@@ -11,11 +11,11 @@
     "require": {
         "php": "^8.4",
 
-        "decodelabs/exceptional": "^0.5.1"
+        "decodelabs/exceptional": "^0.5.2"
     },
     "require-dev": {
         "decodelabs/phpstan-decodelabs": "^0.7",
-        "nesbot/carbon": "^3.8"
+        "nesbot/carbon": "^2|^3"
     },
     "autoload": {
         "psr-4": {

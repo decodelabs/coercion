@@ -1,3 +1,8 @@
+## v0.2.16 (2025-02-17)
+* Accept mixed in toType() functions
+* Improved Exception syntax
+* Updated dependencies
+
 ## v0.2.15 (2025-02-11)
 * Added lazy object support
 * Added PHP8.4 to CI workflow
