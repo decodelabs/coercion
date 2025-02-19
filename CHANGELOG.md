@@ -1,3 +1,6 @@
+## v0.2.17 (2025-02-19)
+* Fixed casting true to 1
+
 ## v0.2.16 (2025-02-17)
 * Accept mixed in toType() functions
 * Improved Exception syntax
