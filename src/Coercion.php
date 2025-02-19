@@ -210,7 +210,10 @@ class Coercion
             $value = (string)$value;
         }
 
-        if (is_numeric($value)) {
+        if (
+            is_numeric($value) ||
+            is_bool($value)
+        ) {
             return (int)$value;
         }
 
@@ -292,7 +295,10 @@ class Coercion
             $value = (string)$value;
         }
 
-        if (is_numeric($value)) {
+        if (
+            is_numeric($value) ||
+            is_bool($value)
+        ) {
             return (float)$value;
         }
 
