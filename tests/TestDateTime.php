@@ -19,13 +19,13 @@ class TestDateTime
     public function testToDateTime(): Carbon
     {
         $date = new Carbon('2020-01-01');
-        return Coercion::toDateTime($date);
+        return Coercion::asDateTime($date);
     }
 
     /*
     public function testMixed(): DateTime
     {
-        $output = Coercion::toDateTime($this->mixedValue());
+        $output = Coercion::asDateTime($this->mixedValue());
         return $output;
     }
 
@@ -38,6 +38,6 @@ class TestDateTime
     public function testToDateInterval(): CarbonInterval
     {
         $date = new CarbonInterval('P1D');
-        return Coercion::toDateInterval($date);
+        return Coercion::asDateInterval($date);
     }
 }
