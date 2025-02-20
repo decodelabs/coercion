@@ -1,3 +1,6 @@
+## v0.3.1 (2025-02-20)
+* Added toDateInterval()
+
 ## v0.3.0 (2025-02-20)
 * Restructured function names
 * Added *Iterable functions

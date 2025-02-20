@@ -913,4 +913,17 @@ class Coercion
 
         return $output;
     }
+
+    /**
+     * Coerce value to DateInterval
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateInterval ? T : DateInterval)
+     */
+    public static function toDateInterval(
+        mixed $value
+    ): DateInterval {
+        return static::tryDateInterval($value) ?? new DateInterval('P0D');
+    }
 }
