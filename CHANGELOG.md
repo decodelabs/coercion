@@ -1,3 +1,10 @@
+## v0.3.0 (2025-02-20)
+* Restructured function names
+* Added *Iterable functions
+* Added generic types to arrays
+* Added Generator support to arrays
+* Added object to stdClass support
+
 ## v0.2.17 (2025-02-19)
 * Fixed casting true to 1
 

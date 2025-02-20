@@ -10,11 +10,14 @@ declare(strict_types=1);
 namespace DecodeLabs;
 
 use BackedEnum;
+use Closure;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use Exception;
+use Generator;
 use ReflectionClass;
+use ReflectionFunction;
 use stdClass;
 use Stringable;
 use Traversable;
@@ -25,10 +28,10 @@ class Coercion
     /**
      * Coerce value to string
      */
-    public static function toString(
+    public static function asString(
         mixed $value
     ): string {
-        if (null === ($value = static::toStringOrNull($value))) {
+        if (null === ($value = static::tryString($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to string'
             );
@@ -40,7 +43,7 @@ class Coercion
     /**
      * Coerce value to string or null
      */
-    public static function toStringOrNull(
+    public static function tryString(
         mixed $value,
         bool $nonEmpty = false
     ): ?string {
@@ -76,7 +79,7 @@ class Coercion
     /**
      * Force value to be string
      */
-    public static function forceString(
+    public static function toString(
         mixed $value
     ): string {
         if (is_bool($value)) {
@@ -87,7 +90,7 @@ class Coercion
             $output = [];
 
             foreach ($value as $inner) {
-                if (strlen($inner = static::forceString($inner))) {
+                if (strlen($inner = static::toString($inner))) {
                     $output[] = $inner;
                 }
             }
@@ -95,7 +98,7 @@ class Coercion
             return implode(' ', $output);
         }
 
-        return (string)static::toStringOrNull($value);
+        return (string)static::tryString($value);
     }
 
     /**
@@ -111,19 +114,22 @@ class Coercion
     }
 
 
+
+
+
     /**
      * Coerce value to bool
      */
     public static function toBool(
         mixed $value
     ): bool {
-        return (bool)static::toBoolOrNull($value);
+        return (bool)static::tryBool($value);
     }
 
     /**
      * Coerce value to bool or null
      */
-    public static function toBoolOrNull(
+    public static function tryBool(
         mixed $value
     ): ?bool {
         if (
@@ -177,13 +183,16 @@ class Coercion
     }
 
 
+
+
+
     /**
      * Coerce value to int
      */
-    public static function toInt(
+    public static function asInt(
         mixed $value
     ): int {
-        if (null === ($value = static::toIntOrNull($value))) {
+        if (null === ($value = static::tryInt($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to int'
             );
@@ -195,7 +204,7 @@ class Coercion
     /**
      * Coerce value to int or null
      */
-    public static function toIntOrNull(
+    public static function tryInt(
         mixed $value
     ): ?int {
         if ($value instanceof BackedEnum) {
@@ -234,14 +243,13 @@ class Coercion
         );
     }
 
-
     /**
      * Force value to be int
      */
-    public static function forceInt(
+    public static function toInt(
         mixed $value
     ): int {
-        return static::toIntOrNull($value) ?? 0;
+        return static::tryInt($value) ?? 0;
     }
 
 
@@ -257,7 +265,7 @@ class Coercion
             return null;
         }
 
-        $value = static::toInt($value);
+        $value = static::asInt($value);
 
         if ($max !== null) {
             $value = min($max, $value);
@@ -270,13 +278,17 @@ class Coercion
         return $value;
     }
 
+
+
+
+
     /**
      * Coerce value to float
      */
-    public static function toFloat(
+    public static function asFloat(
         mixed $value
     ): float {
-        if (null === ($value = static::toFloatOrNull($value))) {
+        if (null === ($value = static::tryFloat($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to float'
             );
@@ -288,7 +300,7 @@ class Coercion
     /**
      * Coerce value to float or null
      */
-    public static function toFloatOrNull(
+    public static function tryFloat(
         mixed $value
     ): ?float {
         if ($value instanceof Stringable) {
@@ -308,10 +320,10 @@ class Coercion
     /**
      * Force value to be float
      */
-    public static function forceFloat(
+    public static function toFloat(
         mixed $value
     ): float {
-        return static::toFloatOrNull($value) ?? 0.0;
+        return static::tryFloat($value) ?? 0.0;
     }
 
 
@@ -327,7 +339,7 @@ class Coercion
             return null;
         }
 
-        $value = static::toFloat($value);
+        $value = static::asFloat($value);
 
         if ($max !== null) {
             $value = min($max, $value);
@@ -353,7 +365,7 @@ class Coercion
             return null;
         }
 
-        $value = static::toFloat($value);
+        $value = static::asFloat($value);
 
         while ($value < 0) {
             $value += 360;
@@ -379,12 +391,15 @@ class Coercion
     /**
      * Coerce value to array
      *
-     * @return array<mixed>
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable ? array<TKey,TValue> : array<mixed>)
      */
-    public static function toArray(
+    public static function asArray(
         mixed $value
     ): array {
-        if (null === ($value = static::toArrayOrNull($value))) {
+        if (null === ($value = static::tryArray($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to array'
             );
@@ -396,11 +411,25 @@ class Coercion
     /**
      * Coerce value to array or null
      *
-     * @return array<mixed>|null
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable ? array<TKey,TValue> : ?array<mixed>)
      */
-    public static function toArrayOrNull(
+    public static function tryArray(
         mixed $value
     ): ?array {
+        if($value instanceof Closure) {
+            $ref = new ReflectionFunction($value);
+
+            if(
+                $ref->isGenerator() &&
+                count($ref->getParameters()) == 0
+            ) {
+                $value = $value();
+            }
+        }
+
         if (
             is_array($value) ||
             $value instanceof stdClass
@@ -418,11 +447,71 @@ class Coercion
     /**
      * Force array value
      *
-     * @return array<mixed>
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable ? array<TKey,TValue> : array<mixed>)
      */
-    public static function forceArray(
+    public static function toArray(
         mixed $value
     ): array {
+        if(null !== ($output = static::tryArray($value))) {
+            return $output;
+        }
+
+        if ($value === null) {
+            return [];
+        }
+
+        return [$value];
+    }
+
+
+
+
+
+    /**
+     * Coerce value to iterable
+     *
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable<TKey,TValue> ? iterable<TKey,TValue> : iterable<mixed>)
+     */
+    public static function asIterable(
+        mixed $value
+    ): iterable {
+        if (null === ($value = static::tryIterable($value))) {
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to iterable'
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce value to iterable or null
+     *
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable<TKey,TValue> ? iterable<TKey,TValue> : ?iterable<mixed>)
+     */
+    public static function tryIterable(
+        mixed $value
+    ): ?iterable {
+        if($value instanceof Closure) {
+            $ref = new ReflectionFunction($value);
+
+            if(
+                $ref->isGenerator() &&
+                count($ref->getParameters()) == 0
+            ) {
+                $value = $value();
+            }
+        }
+
         if (
             is_array($value) ||
             $value instanceof stdClass
@@ -431,7 +520,25 @@ class Coercion
         }
 
         if ($value instanceof Traversable) {
-            return iterator_to_array($value);
+            return $value;
+        }
+
+        return null;
+    }
+
+    /**
+     * Force iterable value
+     *
+     * @template TKey of int|string
+     * @template TValue
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
+     * @return ($value is iterable<TKey,TValue> ? iterable<TKey,TValue> : iterable<mixed>)
+     */
+    public static function toIterable(
+        mixed $value
+    ): iterable {
+        if(null !== ($output = static::tryIterable($value))) {
+            return $output;
         }
 
         if ($value === null) {
@@ -446,12 +553,27 @@ class Coercion
      *
      * @template TKey of int|string
      * @template TValue
-     * @param array<TKey,TValue>|iterable<TKey,TValue> $value
+     * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>) $value
      * @return array<TKey,TValue>
      */
     public static function iterableToArray(
-        iterable $value
+        iterable|Closure $value
     ): array {
+        if($value instanceof Closure) {
+            $ref = new ReflectionFunction($value);
+
+            if(
+                $ref->isGenerator() &&
+                count($ref->getParameters()) == 0
+            ) {
+                $value = $value();
+            } else {
+                throw Exceptional::InvalidArgument(
+                    message: 'Closure must be a generator'
+                );
+            }
+        }
+
         if (!is_array($value)) {
             $value = iterator_to_array($value);
         }
@@ -460,13 +582,62 @@ class Coercion
     }
 
 
+
+    /**
+     * Coerce to object
+     *
+     * @template T of object
+     * @return ($value is object ? T : object)
+     */
+    public static function asObject(
+        mixed $value
+    ): object {
+        if (null === ($value = static::tryStdClass($value))) {
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to stdClass'
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce to object or null
+     *
+     * @template T of object
+     * @return ($value is object ? T : ?object)
+     */
+    public static function tryObject(
+        mixed $value
+    ): ?object {
+        if(is_object($value)) {
+            return $value;
+        }
+
+        return static::tryStdClass($value);
+    }
+
+    /**
+     * Force value to be stdClass
+     *
+     * @template T of object
+     * @return ($value is object ? T : object)
+     */
+    public static function toObject(
+        mixed $value
+    ): object {
+        return static::tryObject($value) ?? new stdClass();
+    }
+
+
+
     /**
      * Coerce to stdClass
      */
-    public static function toStdClass(
+    public static function asStdClass(
         mixed $value
     ): stdClass {
-        if (null === ($value = static::toStdClassOrNull($value))) {
+        if (null === ($value = static::tryStdClass($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to stdClass'
             );
@@ -478,15 +649,26 @@ class Coercion
     /**
      * Coerce to stdClass or null
      */
-    public static function toStdClassOrNull(
+    public static function tryStdClass(
         mixed $value
     ): ?stdClass {
         if ($value instanceof stdClass) {
             return $value;
         }
 
-        if (is_array($value)) {
-            return (object)$value;
+        if(is_object($value)) {
+            $ref = new ReflectionClass($value);
+            $output = new stdClass();
+
+            foreach ($ref->getProperties() as $prop) {
+                $output->{$prop->getName()} = $prop->getValue($value);
+            }
+
+            return $output;
+        }
+
+        if (null !== ($output = static::tryArray($value))) {
+            return (object)$output;
         }
 
         return null;
@@ -495,11 +677,12 @@ class Coercion
     /**
      * Force value to be stdClass
      */
-    public static function forceStdClass(
+    public static function toStdClass(
         mixed $value
     ): stdClass {
-        return static::toStdClassOrNull($value) ?? new stdClass();
+        return static::tryStdClass($value) ?? new stdClass();
     }
+
 
 
 
@@ -510,11 +693,11 @@ class Coercion
      * @param class-string<T> $type
      * @return T
      */
-    public static function toType(
+    public static function asType(
         mixed $value,
         string $type
     ): object {
-        if (null === ($value = static::toTypeOrNull($value, $type))) {
+        if (null === ($value = static::tryType($value, $type))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to ' . $type
             );
@@ -530,7 +713,7 @@ class Coercion
      * @param class-string<T> $type
      * @return T|null
      */
-    public static function toTypeOrNull(
+    public static function tryType(
         mixed $value,
         string $type
     ): ?object {
@@ -540,6 +723,8 @@ class Coercion
 
         return $value;
     }
+
+
 
 
     /**
@@ -576,6 +761,7 @@ class Coercion
 
 
 
+
     /**
      * Coerce value to DateTime
      *
@@ -583,10 +769,10 @@ class Coercion
      * @param T $value
      * @return (T is DateTimeInterface ? T : DateTime)
      */
-    public static function toDateTime(
+    public static function asDateTime(
         mixed $value
     ): DateTimeInterface {
-        if (null === ($value = static::toDateTimeOrNull($value))) {
+        if (null === ($value = static::tryDateTime($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to DateTime'
             );
@@ -602,7 +788,7 @@ class Coercion
      * @param T $value
      * @return (T is DateTimeInterface ? T : ?DateTime)
      */
-    public static function toDateTimeOrNull(
+    public static function tryDateTime(
         mixed $value
     ): ?DateTimeInterface {
         if ($value === null) {
@@ -621,7 +807,7 @@ class Coercion
         if (is_numeric($value)) {
             $timestamp = $value;
             $value = 'now';
-        } elseif (null === ($value = static::toStringOrNull($value))) {
+        } elseif (null === ($value = static::tryString($value))) {
             return null;
         }
 
@@ -634,6 +820,20 @@ class Coercion
         return $value;
     }
 
+    /**
+     * Coerce value to DateTime
+     *
+     * @template T of mixed
+     * @param T $value
+     * @return (T is DateTimeInterface ? T : DateTime)
+     */
+    public static function toDateTime(
+        mixed $value
+    ): DateTimeInterface {
+        return static::tryDateTime($value) ?? new DateTime('now');
+    }
+
+
 
 
     /**
@@ -643,10 +843,10 @@ class Coercion
      * @param T $value
      * @return (T is DateInterval ? T : DateInterval)
      */
-    public static function toDateInterval(
+    public static function asDateInterval(
         mixed $value
     ): DateInterval {
-        if (null === ($value = static::toDateIntervalOrNull($value))) {
+        if (null === ($value = static::tryDateInterval($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'Value could not be coerced to DateInterval'
             );
@@ -662,7 +862,7 @@ class Coercion
      * @param T $value
      * @return (T is DateInterval ? T : ?DateInterval)
      */
-    public static function toDateIntervalOrNull(
+    public static function tryDateInterval(
         mixed $value
     ): ?DateInterval {
         if ($value === null) {
@@ -690,11 +890,11 @@ class Coercion
                 return $output;
             }
 
-            $value = static::toDateTime($value);
+            $value = static::asDateTime($value);
             return $value->diff(new DateTime('now'));
         }
 
-        if (null === ($value = static::toStringOrNull($value))) {
+        if (null === ($value = static::tryString($value))) {
             return null;
         }
 
