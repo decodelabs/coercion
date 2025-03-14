@@ -1,3 +1,6 @@
+## v0.3.2 (2025-03-14)
+* Added Closure and Generator dereferencing to string conversion
+
 ## v0.3.1 (2025-02-20)
 * Added toDateInterval()
 

@@ -47,6 +47,28 @@ class Coercion
         mixed $value,
         bool $nonEmpty = false
     ): ?string {
+        if($value instanceof Closure) {
+            $ref = new ReflectionFunction($value);
+
+            if(count($ref->getParameters()) > 0) {
+                return null;
+            }
+
+            $value = $value();
+        }
+
+        if($value instanceof Generator) {
+            $output = [];
+
+            foreach($value as $inner) {
+                if (null !== ($inner = static::tryString($inner))) {
+                    $output[] = $inner;
+                }
+            }
+
+            $value = implode('', $output);
+        }
+
         if ($value instanceof BackedEnum) {
             $value = is_int($value->value) ?
                 $value->name :
