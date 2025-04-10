@@ -10,7 +10,7 @@
 
 ### Simple tools for managing PHP types
 
-Coercion offers simple tools to help neatly handle coercion of mixed parameters, especially useful when dealing with higher level static analysis test which require strict type handling.
+Coercion offers simple tools to help neatly handle coercion of mixed parameters, especially useful when dealing with higher level static analysis tests which require strict type handling.
 
 _Get news and updates on the [DecodeLabs blog](https://blog.decodelabs.com)._
 
@@ -27,7 +27,7 @@ composer require decodelabs/coercion
 
 ## Usage
 
-Pass any mixed value to the available coerce methods to ensure input types in constructors.
+Pass any mixed value to the available coerce methods to assert types.
 Methods beginning with `as` will throw an exception if the value cannot be coerced to the desired type.
 Methods beginning with `try` will return `null` if the value cannot be coerced to the desired type.
 Methods beginning with `to` will return a default value if the value cannot be coerced to the desired type.
