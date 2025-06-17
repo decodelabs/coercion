@@ -13,6 +13,7 @@ use BackedEnum;
 use Closure;
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Generator;
@@ -743,6 +744,7 @@ class Coercion
             return null;
         }
 
+        /** @var T $value */
         return $value;
     }
 
@@ -853,6 +855,70 @@ class Coercion
         mixed $value
     ): DateTimeInterface {
         return static::tryDateTime($value) ?? new DateTime('now');
+    }
+
+
+
+
+    /**
+     * Coerce value to DateTimeImmutable
+     */
+    public static function asDateTimeImmutable(
+        mixed $value
+    ): DateTimeImmutable {
+        if (null === ($value = static::tryDateTimeImmutable($value))) {
+            throw Exceptional::InvalidArgument(
+                message: 'Value could not be coerced to DateTimeImmutable'
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce value to DateTimeImmutable
+     */
+    public static function tryDateTimeImmutable(
+        mixed $value
+    ): ?DateTimeImmutable {
+        if ($value === null) {
+            return null;
+        } elseif ($value instanceof DateTimeImmutable) {
+            return $value;
+        } else if($value instanceof DateTimeInterface) {
+            return DateTimeImmutable::createFromInterface($value);
+        }
+
+        if ($value instanceof DateInterval) {
+            $now = new DateTimeImmutable('now');
+            return $now->add($value);
+        }
+
+        $timestamp = null;
+
+        if (is_numeric($value)) {
+            $timestamp = $value;
+            $value = 'now';
+        } elseif (null === ($value = static::tryString($value))) {
+            return null;
+        }
+
+        $value = new DateTimeImmutable($value);
+
+        if ($timestamp !== null) {
+            $value = $value->setTimestamp((int)$timestamp);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Coerce value to DateTimeImmutable
+     */
+    public static function toDateTimeImmutable(
+        mixed $value
+    ): DateTimeImmutable {
+        return static::tryDateTimeImmutable($value) ?? new DateTimeImmutable('now');
     }
 
 
