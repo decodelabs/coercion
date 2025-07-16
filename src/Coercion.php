@@ -48,20 +48,20 @@ class Coercion
         mixed $value,
         bool $nonEmpty = false
     ): ?string {
-        if($value instanceof Closure) {
+        if ($value instanceof Closure) {
             $ref = new ReflectionFunction($value);
 
-            if(count($ref->getParameters()) > 0) {
+            if (count($ref->getParameters()) > 0) {
                 return null;
             }
 
             $value = $value();
         }
 
-        if($value instanceof Generator) {
+        if ($value instanceof Generator) {
             $output = [];
 
-            foreach($value as $inner) {
+            foreach ($value as $inner) {
                 if (null !== ($inner = static::tryString($inner))) {
                     $output[] = $inner;
                 }
@@ -442,10 +442,10 @@ class Coercion
     public static function tryArray(
         mixed $value
     ): ?array {
-        if($value instanceof Closure) {
+        if ($value instanceof Closure) {
             $ref = new ReflectionFunction($value);
 
-            if(
+            if (
                 $ref->isGenerator() &&
                 count($ref->getParameters()) == 0
             ) {
@@ -478,7 +478,7 @@ class Coercion
     public static function toArray(
         mixed $value
     ): array {
-        if(null !== ($output = static::tryArray($value))) {
+        if (null !== ($output = static::tryArray($value))) {
             return $output;
         }
 
@@ -524,10 +524,10 @@ class Coercion
     public static function tryIterable(
         mixed $value
     ): ?iterable {
-        if($value instanceof Closure) {
+        if ($value instanceof Closure) {
             $ref = new ReflectionFunction($value);
 
-            if(
+            if (
                 $ref->isGenerator() &&
                 count($ref->getParameters()) == 0
             ) {
@@ -560,7 +560,7 @@ class Coercion
     public static function toIterable(
         mixed $value
     ): iterable {
-        if(null !== ($output = static::tryIterable($value))) {
+        if (null !== ($output = static::tryIterable($value))) {
             return $output;
         }
 
@@ -582,10 +582,10 @@ class Coercion
     public static function iterableToArray(
         iterable|Closure $value
     ): array {
-        if($value instanceof Closure) {
+        if ($value instanceof Closure) {
             $ref = new ReflectionFunction($value);
 
-            if(
+            if (
                 $ref->isGenerator() &&
                 count($ref->getParameters()) == 0
             ) {
@@ -633,7 +633,7 @@ class Coercion
     public static function tryObject(
         mixed $value
     ): ?object {
-        if(is_object($value)) {
+        if (is_object($value)) {
             return $value;
         }
 
@@ -679,7 +679,7 @@ class Coercion
             return $value;
         }
 
-        if(is_object($value)) {
+        if (is_object($value)) {
             $ref = new ReflectionClass($value);
             $output = new stdClass();
 
@@ -885,7 +885,7 @@ class Coercion
             return null;
         } elseif ($value instanceof DateTimeImmutable) {
             return $value;
-        } else if($value instanceof DateTimeInterface) {
+        } elseif ($value instanceof DateTimeInterface) {
             return DateTimeImmutable::createFromInterface($value);
         }
 
