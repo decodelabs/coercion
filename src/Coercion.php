@@ -26,9 +26,6 @@ use UnitEnum;
 
 class Coercion
 {
-    /**
-     * Coerce value to string
-     */
     public static function asString(
         mixed $value
     ): string {
@@ -41,9 +38,6 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce value to string or null
-     */
     public static function tryString(
         mixed $value,
         bool $nonEmpty = false
@@ -99,9 +93,6 @@ class Coercion
     }
 
 
-    /**
-     * Force value to be string
-     */
     public static function toString(
         mixed $value
     ): string {
@@ -124,9 +115,6 @@ class Coercion
         return (string)static::tryString($value);
     }
 
-    /**
-     * Is value stringable
-     */
     public static function isStringable(
         mixed $value
     ): bool {
@@ -140,18 +128,12 @@ class Coercion
 
 
 
-    /**
-     * Coerce value to bool
-     */
     public static function toBool(
         mixed $value
     ): bool {
         return (bool)static::tryBool($value);
     }
 
-    /**
-     * Coerce value to bool or null
-     */
     public static function tryBool(
         mixed $value
     ): ?bool {
@@ -175,9 +157,6 @@ class Coercion
         return (bool)$value;
     }
 
-    /**
-     * Coerce value to bool if boolsy or null
-     */
     public static function parseBool(
         mixed $value
     ): ?bool {
@@ -209,9 +188,6 @@ class Coercion
 
 
 
-    /**
-     * Coerce value to int
-     */
     public static function asInt(
         mixed $value
     ): int {
@@ -224,9 +200,6 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce value to int or null
-     */
     public static function tryInt(
         mixed $value
     ): ?int {
@@ -266,9 +239,6 @@ class Coercion
         );
     }
 
-    /**
-     * Force value to be int
-     */
     public static function toInt(
         mixed $value
     ): int {
@@ -276,9 +246,6 @@ class Coercion
     }
 
 
-    /**
-     * Ensure value is int between min and max range
-     */
     public static function clampInt(
         mixed $value,
         ?int $min = null,
@@ -305,9 +272,7 @@ class Coercion
 
 
 
-    /**
-     * Coerce value to float
-     */
+
     public static function asFloat(
         mixed $value
     ): float {
@@ -320,9 +285,7 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce value to float or null
-     */
+
     public static function tryFloat(
         mixed $value
     ): ?float {
@@ -340,9 +303,7 @@ class Coercion
         return null;
     }
 
-    /**
-     * Force value to be float
-     */
+
     public static function toFloat(
         mixed $value
     ): float {
@@ -350,9 +311,7 @@ class Coercion
     }
 
 
-    /**
-     * Ensure value is float between min and max range
-     */
+
     public static function clampFloat(
         mixed $value,
         ?float $min = null,
@@ -376,9 +335,7 @@ class Coercion
     }
 
 
-    /**
-     * Ensure value is float in 360 degree range
-     */
+
     public static function clampDegrees(
         mixed $value,
         ?float $min = null,
@@ -412,8 +369,6 @@ class Coercion
 
 
     /**
-     * Coerce value to array
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -432,8 +387,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to array or null
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -468,8 +421,6 @@ class Coercion
     }
 
     /**
-     * Force array value
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -494,8 +445,6 @@ class Coercion
 
 
     /**
-     * Coerce value to iterable
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -514,8 +463,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to iterable or null
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -550,8 +497,6 @@ class Coercion
     }
 
     /**
-     * Force iterable value
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>)|mixed $value
@@ -572,8 +517,6 @@ class Coercion
     }
 
     /**
-     * Iterable to array
-     *
      * @template TKey of int|string
      * @template TValue
      * @param iterable<TKey,TValue>|Closure():(Generator<TKey,TValue>) $value
@@ -607,8 +550,6 @@ class Coercion
 
 
     /**
-     * Coerce to object
-     *
      * @template T of object
      * @return ($value is object ? T : object)
      */
@@ -625,8 +566,6 @@ class Coercion
     }
 
     /**
-     * Coerce to object or null
-     *
      * @template T of object
      * @return ($value is object ? T : ?object)
      */
@@ -641,8 +580,6 @@ class Coercion
     }
 
     /**
-     * Force value to be stdClass
-     *
      * @template T of object
      * @return ($value is object ? T : object)
      */
@@ -654,9 +591,6 @@ class Coercion
 
 
 
-    /**
-     * Coerce to stdClass
-     */
     public static function asStdClass(
         mixed $value
     ): stdClass {
@@ -669,9 +603,6 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce to stdClass or null
-     */
     public static function tryStdClass(
         mixed $value
     ): ?stdClass {
@@ -697,9 +628,6 @@ class Coercion
         return null;
     }
 
-    /**
-     * Force value to be stdClass
-     */
     public static function toStdClass(
         mixed $value
     ): stdClass {
@@ -710,8 +638,6 @@ class Coercion
 
 
     /**
-     * Coerce value to type
-     *
      * @template T of object
      * @param class-string<T> $type
      * @return T
@@ -730,8 +656,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to type or null
-     *
      * @template T of object
      * @param class-string<T> $type
      * @return T|null
@@ -752,8 +676,6 @@ class Coercion
 
 
     /**
-     * Create lazy ghost object
-     *
      * @template T of object
      * @param class-string<T> $type
      * @param callable(T): void $initializer
@@ -768,8 +690,6 @@ class Coercion
     }
 
     /**
-     * Create lazy proxy object
-     *
      * @template T of object
      * @param class-string<T> $type
      * @param callable(T): T $factory
@@ -787,8 +707,6 @@ class Coercion
 
 
     /**
-     * Coerce value to DateTime
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateTimeInterface ? T : DateTime)
@@ -806,8 +724,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to DateTime
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateTimeInterface ? T : ?DateTime)
@@ -845,8 +761,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to DateTime
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateTimeInterface ? T : DateTime)
@@ -860,9 +774,6 @@ class Coercion
 
 
 
-    /**
-     * Coerce value to DateTimeImmutable
-     */
     public static function asDateTimeImmutable(
         mixed $value
     ): DateTimeImmutable {
@@ -875,9 +786,6 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce value to DateTimeImmutable
-     */
     public static function tryDateTimeImmutable(
         mixed $value
     ): ?DateTimeImmutable {
@@ -912,9 +820,6 @@ class Coercion
         return $value;
     }
 
-    /**
-     * Coerce value to DateTimeImmutable
-     */
     public static function toDateTimeImmutable(
         mixed $value
     ): DateTimeImmutable {
@@ -925,8 +830,6 @@ class Coercion
 
 
     /**
-     * Coerce value to DateInterval
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateInterval ? T : DateInterval)
@@ -944,8 +847,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to DateInterval or null
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateInterval ? T : ?DateInterval)
@@ -1003,8 +904,6 @@ class Coercion
     }
 
     /**
-     * Coerce value to DateInterval
-     *
      * @template T of mixed
      * @param T $value
      * @return (T is DateInterval ? T : DateInterval)
