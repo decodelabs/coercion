@@ -17,6 +17,8 @@ Coercion offers simple tools to help neatly handle coercion of mixed parameters,
 
 ## Installation
 
+This package requires PHP 8.4 or higher.
+
 Install via Composer:
 
 ```bash
