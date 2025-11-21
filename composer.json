@@ -2,20 +2,28 @@
     "name": "decodelabs/coercion",
     "description": "Simple tools for managing PHP types",
     "type": "library",
-    "keywords": [ "type", "data", "structure" ],
+    "keywords": [
+        "type",
+        "data",
+        "structure"
+    ],
     "license": "MIT",
-    "authors": [ {
+    "authors": [
+        {
             "name": "Tom Wright",
             "email": "tom@inflatablecookie.com"
-        } ],
+        }
+    ],
     "require": {
         "php": "^8.4",
 
         "decodelabs/exceptional": "^0.6.3"
     },
     "require-dev": {
-        "decodelabs/phpstan-decodelabs": "^0.7",
-        "nesbot/carbon": "^3"
+        "nesbot/carbon": "^3",
+
+        "decodelabs/chorus": "^0.1",
+        "decodelabs/phpstan-decodelabs": "^0.7"
     },
     "autoload": {
         "psr-4": {
