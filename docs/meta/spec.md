@@ -10,8 +10,8 @@ This document describes the purpose, contracts, and design of **Coercion** withi
 
 It is aimed at:
 
-- Developers **using** this package.
-- Contributors **maintaining or extending** it.
+- Developers **using** Coercion in their own applications or libraries.
+- Contributors **maintaining or extending** Coercion.
 - Tools and AI assistants that need to reason about its behaviour.
 
 ---
@@ -20,24 +20,18 @@ It is aimed at:
 
 ### 1.1 Purpose
 
-Coercion provides simple, consistent utilities for safely converting mixed-type values to specific PHP types. It addresses the common need to handle `mixed` parameters while maintaining strict type safety for static analysis tools like PHPStan.
-
-Use this package when you need to:
-- Convert user input or configuration values to strongly-typed properties
-- Handle type coercion in a way that satisfies strict static analysis
-- Provide consistent error handling when type conversion fails
-
-The package offers three distinct coercion strategies:
-- **`as*` methods** — throw exceptions on failure (strict validation)
-- **`try*` methods** — return `null` on failure (optional values)
-- **`to*` methods** — return default values on failure (forgiving conversion)
+Coercion provides simple tools for managing PHP types, offering a comprehensive set of methods to safely coerce mixed values to specific types. It helps handle type coercion of mixed parameters, especially useful when dealing with higher-level static analysis tests that require strict type handling. The package provides three patterns for each type: `as*` (throws on error), `try*` (returns null on error), and `to*` (returns default on error).
 
 ### 1.2 Non-Goals
 
-- It does **not** perform validation beyond basic type conversion (use `decodelabs/lucid` for validation)
-- It intentionally avoids complex type inference or automatic value transformation beyond straightforward coercion
-- It does not provide serialization or unserialization utilities
-- It does not handle recursive type coercion for complex nested structures beyond arrays and iterables
+Coercion does **not**:
+
+- Provide validation or sanitization — it only handles type conversion
+- Handle complex object transformations or mapping
+- Provide schema validation or data structure validation
+- Handle type inference or automatic type detection
+- Provide serialization or deserialization capabilities
+- Handle database type conversions or ORM integration
 
 ---
 
@@ -46,62 +40,63 @@ The package offers three distinct coercion strategies:
 ### 2.1 Cluster & Positioning
 
 - **Cluster:** `language` (see Chorus taxonomy)
-- Coercion is a **foundational** utility within the language cluster, providing low-level type conversion primitives used widely across the ecosystem
-- Many Decode Labs packages depend on Coercion for handling mixed inputs, particularly when processing user data, configuration, or external APIs
-- It defines a consistent pattern for type coercion that other packages can rely on
+- Coercion is a foundational language utility package that provides type coercion capabilities for the Decode Labs ecosystem. It sits at a low dependency level, depending only on Exceptional, and is used extensively throughout the ecosystem for handling mixed types safely. It's part of the language cluster alongside other type-related utilities.
 
 ### 2.2 Typical Usage Contexts
 
-Coercion is commonly used:
-- In **HTTP request handling** to convert query parameters, form data, or JSON payloads to typed properties
-- In **CLI commands** when parsing command-line arguments and options
-- During **bootstrapping** when reading configuration files or environment variables
-- In **data pipelines** when transforming external data sources to internal types
-- Throughout the codebase wherever `mixed` values need to be safely converted to specific types
+Typical places Coercion appears:
+
+- Parameter handling in constructors and methods accepting mixed types
+- Configuration value parsing and conversion
+- Command-line argument processing
+- Data transformation pipelines
+- API input handling
+- Database result processing
+- Any code that needs to safely convert mixed values to specific types
+
+Coercion is intended to be used whenever code needs to safely convert mixed values to specific types while maintaining static analysis compatibility and providing clear error handling.
 
 ---
 
 ## 3. Public Surface
 
-> Focus on *conceptual* API, not every symbol.
+> This section focuses on the conceptual API, not every symbol.
 
 ### 3.1 Key Types
 
-- `DecodeLabs\Coercion` — static utility class providing all coercion methods
+The primary public type is:
 
-This package exposes a single public class with static methods. There are no interfaces, traits, or value objects as part of the public API.
+- `DecodeLabs\Coercion`
+  Static utility class providing all coercion methods. All methods are static and organized by target type.
 
 ### 3.2 Main Entry Points
 
-All interaction with Coercion happens through static methods on the `Coercion` class:
+The main usage pattern is through static methods on the `Coercion` class:
 
-- `Coercion::asString($value)` — primary string coercion (throws on failure)
-- `Coercion::asInt($value)` — primary integer coercion (throws on failure)
-- `Coercion::asArray($value)` — primary array coercion (throws on failure)
-- Similar `as*`, `try*`, and `to*` methods for other types
+```php
+use DecodeLabs\Coercion;
 
-The naming convention is consistent across all types:
-- Methods prefixed with `as` throw exceptions if coercion fails
-- Methods prefixed with `try` return `null` if coercion fails
-- Methods prefixed with `to` return default values if coercion fails
+$string = Coercion::asString($value);  // Throws on error
+$string = Coercion::tryString($value); // Returns null on error
+$string = Coercion::toString($value);  // Returns default on error
+```
 
 ---
 
 ## 4. Dependencies
 
-### 4.1 Direct Decode Labs Dependencies
+### 4.1 Decode Labs
 
-- `decodelabs/exceptional` — used for throwing structured exceptions when coercion fails
+- `decodelabs/exceptional` (required)
+  Used for exception handling. All `as*` methods throw `Exceptional::InvalidArgument` when coercion fails.
 
-Exceptional provides the exception factory (`Exceptional::InvalidArgument()`) used throughout Coercion to throw descriptive errors when values cannot be coerced.
+### 4.2 External
 
-### 4.2 External Dependencies
+- None
 
-- None required for runtime operation
+### 4.3 Optional Integrations
 
-PHP 8.4+ built-in types and standard library classes (`DateTime`, `DateInterval`, `ReflectionClass`, etc.) are used directly.
-
-See `composer.json` for supported PHP versions.
+- None
 
 ---
 
@@ -109,273 +104,280 @@ See `composer.json` for supported PHP versions.
 
 ### 5.1 Invariants
 
-- All `as*` methods must throw `Exceptional::InvalidArgument` when coercion fails, never return default values
-- All `try*` methods must return `null` (not `false` or empty strings) when coercion fails
-- All `to*` methods must never throw exceptions; they always return a value of the requested type
-- Methods must never mutate the input value; coercion produces new values
-- String coercion respects enum values: `BackedEnum` with string values uses the value, with int values uses the name; `UnitEnum` uses the name
+- `as*` methods always throw `Exceptional::InvalidArgument` if coercion fails
+- `try*` methods always return `null` if coercion fails
+- `to*` methods always return a sensible default if coercion fails
+- String coercion handles closures (if parameterless), generators, enums, and Stringable objects
+- Array coercion handles closures (if generator), stdClass, and Traversable objects
+- Numeric coercion handles enums, Stringable objects, and boolean values
+- DateTime coercion handles timestamps, DateInterval, and string formats
+- All methods are stateless and have no side effects
 
 ### 5.2 Input & Output Contracts
 
-**String Coercion:**
-- Accepts: strings, `Stringable` objects, numerics, enums, generators (yielding stringable values), closures returning stringable values
-- Returns: non-empty strings by default when using `tryString($value, $nonEmpty = false)`; empty strings can be returned if `$nonEmpty = false`
-- Special handling: generators are converted by joining yielded values; closures are invoked if they take no parameters
+**String Methods:**
+- `asString(mixed $value): string` — Throws exception on error
+- `tryString(mixed $value, bool $nonEmpty = false): ?string` — Returns null on error, optionally rejects empty strings
+- `toString(mixed $value): string` — Returns empty string on error
+- `isStringable(mixed $value): bool` — Checks if value can be converted to string
 
-**Integer/Float Coercion:**
-- Accepts: numeric values, booleans, enums (uses value for `BackedEnum`, index for `UnitEnum`), stringable numerics
-- Returns: appropriate numeric type
-- Clamping methods (`clampInt`, `clampFloat`, `clampDegrees`) accept `null` min/max to indicate no bound
+**Boolean Methods:**
+- `toBool(mixed $value): bool` — Returns false on error
+- `tryBool(mixed $value): ?bool` — Returns null on error
+- `parseBool(mixed $value): ?bool` — Only returns true for strings if string is "booleany" (1, true, yes, on, etc.)
 
-**Array/Iterable Coercion:**
-- Accepts: arrays, `Traversable` objects, `stdClass`, closures returning generators
-- Returns: arrays or iterables preserving keys where possible
-- `toArray` wraps non-iterable values in a single-element array
+**Integer Methods:**
+- `asInt(mixed $value): int` — Throws exception on error
+- `tryInt(mixed $value): ?int` — Returns null on error
+- `toInt(mixed $value): int` — Returns 0 on error
+- `clampInt(mixed $value, ?int $min, ?int $max): ?int` — Clamps value to range, returns null if input is null
 
-**Object Coercion:**
-- Accepts: objects, arrays, `stdClass`
-- `asObject`/`tryObject` accept any object type
-- `asStdClass`/`tryStdClass` convert objects to `stdClass` via reflection
+**Float Methods:**
+- `asFloat(mixed $value): float` — Throws exception on error
+- `tryFloat(mixed $value): ?float` — Returns null on error
+- `toFloat(mixed $value): float` — Returns 0.0 on error
+- `clampFloat(mixed $value, ?float $min, ?float $max): ?float` — Clamps value to range, returns null if input is null
+- `clampDegrees(mixed $value, ?float $min, ?float $max): ?float` — Clamps degrees (0-359) with wraparound, returns null if input is null
 
-**DateTime/DateInterval Coercion:**
-- Accepts: `DateTimeInterface` instances, strings, timestamps (numeric), `DateInterval` instances
-- Returns: `DateTime` instances (not `DateTimeImmutable` for `asDateTime`)
-- `tryDateTime` can convert `DateInterval` by adding to current time
+**Array Methods:**
+- `asArray(mixed $value): array` — Throws exception on error
+- `tryArray(mixed $value): ?array` — Returns null on error
+- `toArray(mixed $value): array` — Returns empty array or single-element array on error
 
-**Type Coercion:**
-- `asType`/`tryType` perform instanceof checks only; no conversion logic
-- Used for type assertions when you already have an object
+**Iterable Methods:**
+- `asIterable(mixed $value): iterable` — Throws exception on error
+- `tryIterable(mixed $value): ?iterable` — Returns null on error
+- `toIterable(mixed $value): iterable` — Returns empty array or single-element array on error
+- `iterableToArray(iterable|Closure $value): array` — Converts iterable to array
 
-**Lazy Loading:**
-- `newLazyGhost` and `newLazyProxy` wrap PHP 8.4's reflection-based lazy loading features
-- Provide convenient access to `ReflectionClass::newLazyGhost()` and `ReflectionClass::newLazyProxy()`
+**Object Methods:**
+- `asObject(mixed $value): object` — Throws exception on error
+- `tryObject(mixed $value): ?object` — Returns null on error
+- `toObject(mixed $value): object` — Returns new stdClass on error
+
+**stdClass Methods:**
+- `asStdClass(mixed $value): stdClass` — Throws exception on error
+- `tryStdClass(mixed $value): ?stdClass` — Returns null on error
+- `toStdClass(mixed $value): stdClass` — Returns new stdClass on error
+
+**Type Methods:**
+- `asType(mixed $value, class-string<T> $type): T` — Throws exception on error
+- `tryType(mixed $value, class-string<T> $type): ?T` — Returns null on error
+
+**Lazy Methods:**
+- `newLazyGhost(class-string<T> $type, callable $initializer): T` — Creates lazy ghost object
+- `newLazyProxy(class-string<T> $type, callable $factory): T` — Creates lazy proxy object
+
+**DateTime Methods:**
+- `asDateTime(mixed $value): DateTimeInterface` — Throws exception on error
+- `tryDateTime(mixed $value): ?DateTimeInterface` — Returns null on error
+- `toDateTime(mixed $value): DateTimeInterface` — Returns current time on error
+- `asDateTimeImmutable(mixed $value): DateTimeImmutable` — Throws exception on error
+- `tryDateTimeImmutable(mixed $value): ?DateTimeImmutable` — Returns null on error
+- `toDateTimeImmutable(mixed $value): DateTimeImmutable` — Returns current time on error
+
+**DateInterval Methods:**
+- `asDateInterval(mixed $value): DateInterval` — Throws exception on error
+- `tryDateInterval(mixed $value): ?DateInterval` — Returns null on error
+- `toDateInterval(mixed $value): DateInterval` — Returns zero interval on error
+
+### 5.3 Special Behaviours
+
+**Closure Handling:**
+- String coercion: Executes parameterless closures and processes result
+- Array/Iterable coercion: Executes generator closures (parameterless) and processes result
+
+**Enum Handling:**
+- String coercion: Uses enum name for UnitEnum, value or name for BackedEnum
+- Integer coercion: Uses enum value for BackedEnum (if int), or enum index for UnitEnum
+
+**Generator Handling:**
+- String coercion: Iterates generator and joins string values
+- Array coercion: Converts generator to array via `iterator_to_array()`
+
+**DateTime Handling:**
+- Accepts timestamps (numeric), DateInterval (adds to now), and string formats
+- DateInterval coercion can convert DateTimeInterface (diff from now) or numeric values
+
+**Clamping:**
+- `clampInt` and `clampFloat` constrain values to min/max range
+- `clampDegrees` wraps values around 0-359 range before clamping
 
 ---
 
 ## 6. Error Handling
 
-### 6.1 Exception Types
-
-- `Exceptional::InvalidArgument` — thrown by all `as*` methods when coercion fails
-- This exception is provided by `decodelabs/exceptional` and implements the Decode Labs exception pattern
-
-### 6.2 Error Strategy
-
-Coercion follows a **fail-fast** approach for `as*` methods:
-- Exceptions are thrown immediately when coercion is impossible
-- Error messages are descriptive, indicating which type was expected
-- No silent failures or warnings
-
-For `try*` and `to*` methods:
-- Failures are indicated by return values (`null` or defaults)
-- No exceptions are thrown
-
-This aligns with the Decode Labs strategy of using Exceptional for all exceptions, providing structured error information and better debugging context.
+- All `as*` methods throw `Exceptional::InvalidArgument` when coercion fails
+- All `try*` methods return `null` when coercion fails (graceful degradation)
+- All `to*` methods return sensible defaults when coercion fails (empty string, 0, empty array, etc.)
+- `parseBool` returns `null` for non-boolean-like strings (strict parsing)
+- `tryBool` returns `null` for empty strings, otherwise converts to boolean
+- `clampInt` and `clampFloat` return `null` if input is `null` (preserves nullability)
+- DateInterval parsing throws `Exceptional::InvalidArgument` if string cannot be parsed
 
 ---
 
 ## 7. Configuration & Extensibility
 
-### 7.1 Configuration
-
-Coercion requires no configuration. All behavior is determined by method parameters and input values.
-
-### 7.2 Extension Points
-
-Coercion is not designed to be extended. It provides a fixed set of coercion strategies that are intended to be consistent across the ecosystem.
-
-If custom coercion logic is needed:
-- Implement wrapper functions or helper classes in your application
-- Consider contributing to Coercion if the need is general enough for the ecosystem
-
-There are no hooks, events, or plugin mechanisms.
+- Coercion is not configurable — all behaviour is fixed
+- No extension points are provided — it's a utility class with static methods
+- Custom coercion logic should be implemented separately or wrapped around Coercion methods
 
 ---
 
 ## 8. Interactions with Other Packages
 
-Coercion is used extensively throughout the Decode Labs ecosystem:
+### 8.1 Exceptional
 
-- **`decodelabs/enumerable`** — uses Coercion for enum value conversion
-- **`decodelabs/atlas`** — uses Coercion when reading filesystem metadata
-- **`decodelabs/terminus`** — uses Coercion for CLI argument parsing
-- **`decodelabs/commandment`** — uses Coercion for command parameter processing
-- **`decodelabs/lucid`** — may use Coercion as a foundation for value sanitization
-- **`decodelabs/collections`** — uses Coercion for type conversions in collection operations
-- **`decodelabs/elementary`**, **`decodelabs/tagged`** — use Coercion when processing markup data
-- **`decodelabs/harvest`** — uses Coercion for HTTP request/response value handling
-- **`decodelabs/fabric`** — uses Coercion throughout for framework-level type handling
-
-Many other packages in the ecosystem depend on Coercion as a foundational utility for handling mixed input types in a type-safe manner.
+Coercion uses Exceptional for all exception handling. All `as*` methods throw `Exceptional::InvalidArgument` when coercion fails, providing consistent error handling across the ecosystem.
 
 ---
 
 ## 9. Usage Examples
 
-### 9.1 Basic Usage
-
-Converting user input to typed properties:
+### 9.1 Basic Type Coercion
 
 ```php
 use DecodeLabs\Coercion;
 
-final class UserConfig
-{
-    public function __construct(
-        array $data,
-    ) {
-        $this->name = Coercion::asString($data['name']); // Throws if missing/invalid
-        $this->age = Coercion::tryInt($data['age']); // Returns null if invalid
-        $this->isActive = Coercion::toBool($data['isActive'] ?? false);
-    }
+class MyClass {
+    protected string $string;
+    protected ?string $optionalString;
+    protected int $int;
 
-    public readonly string $name;
-    public ?int $age;
-    public bool $isActive;
+    public function __construct(array $params) {
+        // Throw on error
+        $this->string = Coercion::asString($params['maybeString']);
+        
+        // Return default on error
+        $this->string = Coercion::toString($params['maybeString']);
+        
+        // Return null on error
+        $this->optionalString = Coercion::tryString($params['maybeString']);
+        
+        // Integer coercion
+        $this->int = Coercion::asInt($params['maybeInt']);
+    }
 }
 ```
 
-### 9.2 Handling Optional Values
-
-Using `try*` methods for optional configuration:
+### 9.2 Safe Coercion with Fallbacks
 
 ```php
-$timeout = Coercion::tryInt($config['timeout']) ?? 30;
-$message = Coercion::tryString($config['message'], nonEmpty: true) ?? 'Default message';
+use DecodeLabs\Coercion;
+
+$value = $_GET['count'] ?? null;
+$count = Coercion::tryInt($value) ?? 10; // Default to 10 if null
+
+$value = $_GET['enabled'] ?? null;
+$enabled = Coercion::parseBool($value) ?? false; // Strict boolean parsing
 ```
 
-### 9.3 Array Conversion
-
-Converting various iterable types to arrays:
+### 9.3 Array and Iterable Handling
 
 ```php
-$array = Coercion::asArray($someIterable); // Works with arrays, Traversable, stdClass
-$array = Coercion::toArray($value); // Wraps non-iterables in array
+use DecodeLabs\Coercion;
+
+$data = Coercion::asArray($mixedValue);
+$iterable = Coercion::asIterable($mixedValue);
+$array = Coercion::iterableToArray($iterable);
 ```
 
 ### 9.4 DateTime Handling
 
-Flexible date/time coercion:
-
 ```php
-$date = Coercion::asDateTime('2024-01-01'); // String
-$date = Coercion::asDateTime(1704067200); // Timestamp
-$date = Coercion::toDateTime(null); // Defaults to 'now'
+use DecodeLabs\Coercion;
+
+$date = Coercion::asDateTime('2025-05-16');
+$date = Coercion::asDateTime(1715817600); // Timestamp
+$date = Coercion::asDateTime(new DateInterval('P1D')); // Adds to now
+$date = Coercion::toDateTime(null); // Returns current time
 ```
 
-### 9.5 Enum Support
-
-Automatic enum value extraction:
+### 9.5 Clamping Values
 
 ```php
-enum Status : string
-{
-    case Active = 'active';
-    case Inactive = 'inactive';
-}
+use DecodeLabs\Coercion;
 
-$status = Status::Active;
-$string = Coercion::asString($status); // 'active'
-$index = Coercion::asInt($status); // Would use name or index depending on enum type
+$value = Coercion::clampInt($input, 0, 100); // Clamp to 0-100
+$degrees = Coercion::clampDegrees($angle, 0, 180); // Wrap and clamp degrees
+```
+
+### 9.6 Type Checking
+
+```php
+use DecodeLabs\Coercion;
+
+$object = Coercion::asType($value, MyClass::class);
+$object = Coercion::tryType($value, MyClass::class); // Returns null if not instance
 ```
 
 ---
 
-## 10. Implementation Notes (For Contributors)
+## 10. Implementation Notes (for Contributors)
 
-### 10.1 Internal Architecture
+### 10.1 Method Naming Conventions
 
-Coercion is implemented as a single static class with no internal state. Methods are organized by target type:
-- String coercion methods
-- Boolean coercion methods
-- Integer coercion methods
-- Float coercion methods
-- Array/iterable coercion methods
-- Object coercion methods
-- DateTime/DateInterval coercion methods
-- Type assertion methods
-- Lazy loading helper methods
+- `as*`: Throws exception on error (assertive)
+- `try*`: Returns null on error (safe)
+- `to*`: Returns default on error (permissive)
 
-The implementation uses PHP's native type juggling where safe, combined with explicit checks for edge cases (enums, generators, closures).
+### 10.2 Type Handling
 
-Special handling includes:
-- Reflection-based inspection of closures to determine if they're parameterless generators
-- Enum value extraction with fallback to name/index
-- Generator iteration and joining for string conversion
+- Enums are handled specially: BackedEnum uses value (if matching type) or name, UnitEnum uses name
+- Generators are handled by iterating and processing values
+- Closures are executed if parameterless (checked via reflection)
+- Stringable objects are converted via `(string)` cast
+- Numeric strings are handled via `is_numeric()` check
 
-### 10.2 Performance Considerations
+### 10.3 DateTime Parsing
 
-- Coercion methods are designed to be fast for common cases (direct type checks)
-- Reflection is used sparingly (closures, lazy loading) and results are not cached
-- Generator handling involves iteration, which may be expensive for large generators
-- No memoization or caching is performed
+- Numeric values are treated as timestamps
+- DateInterval values are added to current time
+- String values are parsed via DateTime constructor
+- DateTimeImmutable uses `createFromInterface()` for conversion
 
-For high-frequency paths, prefer `try*` methods over `as*` if you can handle `null` efficiently, as it avoids exception overhead.
+### 10.4 DateInterval Parsing
 
-### 10.3 Gotchas & Historical Decisions
+- DateTimeInterface values are converted via `diff()` from now
+- Numeric values are treated as seconds if small, timestamps if large
+- String values are parsed via DateInterval constructor or `createFromDateString()`
 
-- **`asObject` vs `asStdClass`**: `asObject` actually calls `asStdClass` internally but returns `object`. This is intentional to allow `asObject` to accept any object type, while `asStdClass` specifically converts to `stdClass`.
-- **DateTime vs DateTimeImmutable**: `asDateTime` and `tryDateTime` return `DateTime` instances, not `DateTimeImmutable`. There are separate `asDateTimeImmutable` methods for immutable dates. This maintains compatibility with code expecting mutable `DateTime` objects.
-- **Enum index calculation**: `getEnumIndex` iterates through enum cases to find the index. This is O(n) but necessary since PHP doesn't provide a direct way to get enum case index.
-- **Generator handling**: Generators are eagerly consumed for string/array conversion. This means they cannot be reused after coercion.
+### 10.5 Clamping Logic
+
+- `clampInt` and `clampFloat` use `min()` and `max()` to constrain values
+- `clampDegrees` wraps values around 0-359 range using modulo-like logic before clamping
+
+### 10.6 Lazy Object Creation
+
+- Uses PHP 8.4+ reflection methods `newLazyGhost()` and `newLazyProxy()`
+- Requires reflection support for the target class
 
 ---
 
 ## 11. Testing & Quality
 
-### 11.1 Testing Strategy
+- **Code Quality Score:** 4.5/5
+- **README Quality Score:** 3/5
+- **Documentation Score:** 0/5 (this spec)
+- **Test Coverage Score:** 0/5
 
-Current test coverage is minimal (scores: code 4.5, readme 3, docs 0, tests 0).
-
-The `tests/` directory contains a single PHPStan-focused test file (`TestDateTime.php`) that demonstrates type inference for static analysis tools.
-
-Comprehensive unit tests covering all coercion scenarios would be valuable but are not yet implemented.
-
-### 11.2 Quality Signals
-
-- **Code quality**: High (4.5/5) — well-structured, type-safe, uses modern PHP features appropriately
-- **Readme quality**: Moderate (3/5) — documents API surface adequately but could provide more examples
-- **Documentation**: None (0/5) — this spec is the first comprehensive documentation
-- **Test coverage**: None (0/5) — functional tests are needed
-
-Known gaps:
-- Missing comprehensive test suite
-- Limited edge case documentation
-- No performance benchmarks
+See `composer.json` for supported PHP versions.
 
 ---
 
 ## 12. Roadmap & Future Ideas
 
-Potential improvements under consideration:
-
-- **Comprehensive test suite** — unit tests for all coercion methods and edge cases
-- **Performance optimization** — caching of reflection results where appropriate
-- **Additional type support** — consideration of additional target types based on ecosystem needs
-- **Better enum handling** — if PHP provides better enum introspection in future versions
-
-No breaking changes are currently planned. The API is stable and widely used across the ecosystem.
+- Add support for more complex type conversions
+- Consider adding validation alongside coercion
+- Add support for custom coercion rules
+- Consider adding schema-based coercion
+- Improve error messages with more context
+- Add test coverage
 
 ---
 
 ## 13. References
 
-- **Chorus docs:**
-  - Architecture principles
-  - Taxonomy & clusters (language cluster)
-  - Error handling strategy (Exceptional pattern)
-- **Related packages:**
-  - `decodelabs/exceptional` — exception handling
-  - `decodelabs/lucid` — validation (may use Coercion internally)
-  - `decodelabs/nuance` — type inspection tools
-
-```text
-https://github.com/decodelabs/coercion
-https://github.com/decodelabs/chorus
-```
-
----
-
-> This spec is intended to stay in sync with the **actual behaviour** of the package.
-> When you make significant changes to the public surface or semantics, please update this document and, where applicable, add or update ADRs in Chorus.
-
+- [Exceptional Package](https://github.com/decodelabs/exceptional) — Exception handling
+- [Chorus Package Index](../../../chorus/config/packages.json) — Ecosystem metadata
