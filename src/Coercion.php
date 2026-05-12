@@ -870,6 +870,7 @@ class Coercion
 
         if (is_int($value)) {
             if ($value < time() / 10) {
+                // @phpstan-ignore-next-line
                 if (false === ($output = DateInterval::createFromDateString((string)$value . ' seconds'))) {
                     throw Exceptional::InvalidArgument(
                         message: 'DateInterval value could not be parsed'
@@ -894,6 +895,7 @@ class Coercion
             }
         }
 
+        // @phpstan-ignore-next-line
         if (false === ($output = DateInterval::createFromDateString($value))) {
             throw Exceptional::InvalidArgument(
                 message: 'DateInterval value could not be parsed'
