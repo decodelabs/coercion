@@ -193,7 +193,7 @@ $string = Coercion::toString($value);  // Returns default on error
 
 **Generator Handling:**
 - String coercion: Iterates generator and joins string values
-- Array coercion: Converts generator to array via `iterator_to_array()`
+- Array coercion: Preserves generator keys and overwrite order; null keys normalize to the empty string.
 
 **DateTime Handling:**
 - Accepts timestamps (numeric), DateInterval (adds to now), and string formats

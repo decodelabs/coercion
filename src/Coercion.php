@@ -414,7 +414,7 @@ class Coercion
         }
 
         if ($value instanceof Traversable) {
-            return iterator_to_array($value);
+            return iterator_to_array(self::normalizeArrayKeys($value));
         }
 
         return null;
@@ -541,10 +541,24 @@ class Coercion
         }
 
         if (!is_array($value)) {
-            $value = iterator_to_array($value);
+            /** @var array<TKey,TValue> $value */
+            $value = iterator_to_array(self::normalizeArrayKeys($value));
         }
 
         return $value;
+    }
+
+
+    /**
+     * @param Traversable<mixed,mixed> $value
+     * @return Generator<mixed,mixed>
+     */
+    private static function normalizeArrayKeys(
+        Traversable $value
+    ): Generator {
+        foreach ($value as $key => $item) {
+            yield $key ?? '' => $item;
+        }
     }
 
 
